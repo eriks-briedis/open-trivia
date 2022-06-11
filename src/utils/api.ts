@@ -1,4 +1,4 @@
-import type { CategoryListResponse } from '../model';
+import type { CategoryListResponse, QuestionListResponse } from '../model';
 
 export class Api {
   apiUrl: string;
@@ -12,6 +12,20 @@ export class Api {
 
     if (!response.ok) {
       throw new Error('Failed to load categories');
+    }
+
+    return response.json();
+  }
+
+  public async getQuestions(body: Record<string, any>): Promise<QuestionListResponse> {
+    const requestUrl = new URL(`${this.apiUrl}/api.php`);
+    Object.keys(body)
+      .filter((key) => !!body[key])
+      .forEach((key) => requestUrl.searchParams.set(key, body[key] as string));
+
+    const response = await fetch(requestUrl.toString());
+    if (!response.ok) {
+      throw new Error('Failed to load questions');
     }
 
     return response.json();
