@@ -1,7 +1,13 @@
+import { useState } from 'react';
+import { Start } from './components';
+
 function App() {
+  const [status, setStatus] = useState<'intro' | 'settings' | 'game'>('intro');
+
   return (
     <>
-      <h1>Open Trivia</h1>
+      {status === 'intro' && <Start onStart={() => setStatus('settings')} />}
+      {status === 'settings' && <div>@TODO Game Settings</div>}
     </>
   );
 }
