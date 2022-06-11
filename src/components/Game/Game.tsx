@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Question } from "../../model";
 import { Api } from "../../utils";
 import { Error } from "../Error";
@@ -14,6 +14,7 @@ export interface GameProps {
 export const Game: React.FC<GameProps> = ({ options, onBack }) => {
   const [state, setState] = useState<'idle' | 'loading' | 'error'>('loading');
   const [questions, setQuestions] = useState<Question[]>();
+  const mounted = useRef('');
 
   const initGame = useCallback(async () => {
     const api = new Api();
@@ -33,7 +34,13 @@ export const Game: React.FC<GameProps> = ({ options, onBack }) => {
   }, [options]);
 
   useEffect(() => {
+    const stringOptions = JSON.stringify(options);
+    if (mounted.current === stringOptions) {
+      return;
+    }
+
     initGame();
+    mounted.current = stringOptions;
   }, [initGame, options]);
 
   return (

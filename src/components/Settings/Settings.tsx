@@ -1,7 +1,7 @@
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { Category } from "../../model";
 import { Api } from "../../utils";
 import { SelectMenu } from "../SelectMenu";
@@ -21,6 +21,7 @@ export const Settings: React.FC<SettingsProps> = ({ onStartGame }) => {
   const [activeCategory, setActiveCategory] = useState<number | string>('');
   const [difficulty, setDifficulty] = useState<string>('easy');
   const [amount, setAmount] = useState<number>(10);
+  const mounted = useRef<boolean>(false);
 
   const initCategories = async () => {
     const api = new Api();
@@ -38,7 +39,12 @@ export const Settings: React.FC<SettingsProps> = ({ onStartGame }) => {
   }, [activeCategory, difficulty, amount, onStartGame])
 
   useEffect(() => {
+    if (mounted.current) {
+      return;
+    }
+
     initCategories();
+    mounted.current = true;
   }, []);
 
   return (
