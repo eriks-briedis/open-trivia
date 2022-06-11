@@ -1,28 +1,35 @@
-import { CircularProgress } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import { Question } from "../../model";
 import { Api } from "../../utils";
+import { Error } from "../Error";
+import { GameQuestion } from "../GameQuestion";
+import { Loading } from "../Loading";
 import { GameOptions } from "../Settings"
 
 export interface GameProps {
   options: GameOptions;
+  onBack: () => void;
 }
 
-export const Game: React.FC<GameProps> = ({ options }) => {
+export const Game: React.FC<GameProps> = ({ options, onBack }) => {
   const [state, setState] = useState<'idle' | 'loading' | 'error'>('loading');
   const [questions, setQuestions] = useState<Question[]>();
 
   const initGame = useCallback(async () => {
     const api = new Api();
-    const response = await api.getQuestions(options);
+    try {
+      const response = await api.getQuestions(options);
 
-    if (response.response_code !== 0) {
+      if (response.response_code !== 0) {
+        setState('error');
+        return;
+      }
+
+      setState('idle');
+      setQuestions(response.results);
+    } catch (e) {
       setState('error');
-      return;
     }
-
-    setState('idle');
-    setQuestions(response.results);
   }, [options]);
 
   useEffect(() => {
@@ -31,10 +38,10 @@ export const Game: React.FC<GameProps> = ({ options }) => {
 
   return (
     <>
-      {state === 'loading' && <CircularProgress />}
-      {state === 'error' && <h1 style={{ textAlign: 'center' }}>Oops! Something went wrong. 🤷‍♂️</h1>}
+      {state === 'loading' && <Loading />}
+      {state === 'error' && <Error onBack={onBack} />}
       {state === 'idle' && !!questions?.length && questions.map((question, i) => (
-        <div key={i}>{question.question}</div>
+        <GameQuestion key={i} question={question} />
       ))}
     </>
   )

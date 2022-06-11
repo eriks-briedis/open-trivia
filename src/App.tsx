@@ -14,7 +14,7 @@ function App() {
     <>
       {status === 'intro' && <Start onStart={() => setStatus('settings')} />}
       {status === 'settings' && <Settings onStartGame={handleGameStart} />}
-      {status === 'game' && !!options && <Game options={options} />}
+      {status === 'game' && !!options && <Game options={options} onBack={() => setStatus('settings')} />}
     </>
   );
 }
